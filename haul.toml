@@ -1,0 +1,13 @@
+Name = "raylib-tilemap"
+
+[Build]
+compiler = "g++"
+compiler_arguments = "-std=c++20"
+linker = "g++"
+include_source_directory = true
+
+[[libraries]]
+source = "https://github.com/raysan5/raylib"
+install_command = "make PLATFORM=PLATFORM_DESKTOP"
+install_command_path = "src"
+include = ["src"]

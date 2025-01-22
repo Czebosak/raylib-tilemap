@@ -1,0 +1,86 @@
+#include <raylib.h>
+
+#include <raymath.h>
+#include <cstdio>
+#include <vector>
+
+#include <camera_ext.hpp>
+#include <render.hpp>
+#include <tilemap.hpp>
+
+int main() {
+    Vector2 render_resolution = { 640.0f, 320.0f };
+    Vector2 window_resolution = { 1920.0f, 1080.0f };
+
+    InitWindow(window_resolution.x, window_resolution.y, "Hi x3");
+
+    CameraExt camera;
+    camera.render_resolution = v2tov2i(render_resolution);
+    camera.target = { 0.0f, 0.0f };
+    camera.offset = { render_resolution.x/2.0f, render_resolution.y/2.0f };
+    camera.rotation = 0.0f;
+    camera.zoom = 1.0f;
+
+    Vector2 player_position = { 0.0f, 0.0f };
+    Texture2D player_texture = LoadTexture("assets/textures/yes_hair_bootsmoved.png");
+
+    RenderSystem render_system;
+    render_system.active_camera = &camera;
+
+    std::vector<TileProperties> tile_properties_vec = {
+        TileProperties("assets/textures/dirt.png"),
+        TileProperties("assets/textures/grass.png")
+    };
+
+    for (TileProperties& tile_properties : tile_properties_vec) {
+        tile_properties.load_texture();
+    }
+
+    Tilemap tilemap(tile_properties_vec);
+
+    printf("\n%d\n", tilemap.get_data_from_file("sd.map"));
+    printf("%d, %d\n", tilemap.get_size().x, tilemap.get_size().y);
+
+    render_system.active_tilemap = &tilemap;
+
+    RenderTexture2D screen_texture = LoadRenderTexture(640, 320);
+
+    while (!WindowShouldClose()) {
+        // Update camera stuff
+        Vector2 direction = { 0.0f, 0.0f };
+        if (IsKeyDown(KEY_W)) {
+            direction.y -= 1.0f;
+        }
+        if (IsKeyDown(KEY_S)) {
+            direction.y += 1.0f;
+        }
+        if (IsKeyDown(KEY_A)) {
+            direction.x -= 1.0f;
+        }
+        if (IsKeyDown(KEY_D)) {
+            direction.x += 1.0f;
+        }
+
+        player_position += Vector2Normalize(direction);
+        camera.target = player_position;
+
+        BeginTextureMode(screen_texture);
+            ClearBackground(WHITE);
+            BeginMode2D(camera);
+                printf("%d\n", render_system.chunk_is_visible(Vector2i(0, 0)));
+                /*render_system.draw_tilemap(*render_system.active_tilemap);*/
+                render_system.draw_tilemap_culled(*render_system.active_tilemap);
+                DrawTextureV(player_texture, player_position - Vector2 { player_texture.width/2.0f, player_texture.height/2.0f }, WHITE);
+            EndMode2D();
+        EndTextureMode();
+
+        BeginDrawing();
+            ClearBackground(BLACK);
+            DrawTexturePro(screen_texture.texture, { 0.0f, 0.0f, render_resolution.x, -render_resolution.y }, { 0.0f, 0.0f, window_resolution.x, window_resolution.y }, { 0.0f, 0.0f }, 0.0f, WHITE);
+        EndDrawing();
+    }
+
+    CloseWindow();
+
+    return 0;
+}
