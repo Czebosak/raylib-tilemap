@@ -54,8 +54,9 @@ int Tilemap::get_data_from_file(const std::string filename) {
 TilemapChunk Tilemap::get_chunk(u32 x, u32 y) {
     TilemapChunk chunk;
 
+    // Fill the chunk with a pointer to each row
     for (int i = 0; i < TILEMAP_CHUNK_SIZE; i++) {
-        int a = (x + (y * this->size.x)) + (i * this->size.x);
+        int a = ((x * TILEMAP_CHUNK_SIZE) + (y * TILEMAP_CHUNK_SIZE * this->size.x)) + (i * this->size.x);
         chunk.tile[i] = &this->data[a];
     }
 
