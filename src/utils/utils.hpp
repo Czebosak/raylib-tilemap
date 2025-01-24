@@ -14,10 +14,10 @@ typedef int32_t i32;
 typedef int64_t i64;
 
 struct Vector2i {
-    u32 x;
-    u32 y;
+    i32 x;
+    i32 y;
 
-    Vector2i(u32 x, u32 y);
+    Vector2i(i32 x, i32 y);
     
     static Vector2i zero();
 

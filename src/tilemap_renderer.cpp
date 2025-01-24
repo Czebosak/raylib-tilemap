@@ -5,16 +5,6 @@
 
 #include <tilemap.hpp>
 
-/*Rectanglei TilemapRenderer::get_visible_chunks() const {*/
-/*    Rectanglei chunk_bounds;*/
-/**/
-/*    if (active_camera.screen_to_world(0) < 0) {*/
-/*        ;*/
-/*    }*/
-/**/
-/*    return chunk_bounds;*/
-/*}*/
-
 bool TilemapRenderer::chunk_is_visible(const Vector2i pos) const {
     Vector2i chunk_size = active_tilemap->get_tile_size() * TILEMAP_CHUNK_SIZE;
 
@@ -24,15 +14,10 @@ bool TilemapRenderer::chunk_is_visible(const Vector2i pos) const {
     // Calculate the screen position of the chunk
     Vector2i screen_chunk_pos = v2tov2i(active_camera->world_to_screen(v2itov2(world_chunk_pos)));
 
-    Rectanglei screen_chunk_rec = Rectanglei { screen_chunk_pos, chunk_size };
+    Rectanglei screen_chunk_rec = Rectanglei(screen_chunk_pos, chunk_size);
 
     // Create the camera screen rec
-    Rectanglei screen_rec = Rectanglei { Vector2i { 0, 0 }, active_camera->render_resolution };
-
-    if ((pos.x == 0) && (pos.y == 0)) {
-        printf("Screen: %d, %d, %d, %d\n", screen_rec.pos.x, screen_rec.pos.y, screen_rec.size.x, screen_rec.size.y);
-        printf("Screenspace chunk: %d, %d, %d, %d\n", screen_chunk_rec.pos.x, screen_chunk_rec.pos.y, screen_chunk_rec.size.x, screen_chunk_rec.size.y);
-    }
+    Rectanglei screen_rec = Rectanglei { Vector2i(0, 0), active_camera->render_resolution };
 
     return is_colliding(screen_rec, screen_chunk_rec);
 }
@@ -55,7 +40,7 @@ void TilemapRenderer::draw_tilemap_culled(Tilemap& tilemap) const {
 
     for (u32 chunk_x = 0; chunk_x < tilemap.get_size().x / 16; chunk_x++) {
         for (u32 chunk_y = 0; chunk_y < tilemap.get_size().y / 16; chunk_y++) {
-            if (chunk_is_visible(Vector2i { chunk_x, chunk_y })) {
+            if (chunk_is_visible(Vector2i(chunk_x, chunk_y))) {
                 TilemapChunk chunk = tilemap.get_chunk(chunk_x, chunk_y);
 
                 for (int tile_x = 0; tile_x < TILEMAP_CHUNK_SIZE; tile_x++) {
@@ -63,7 +48,7 @@ void TilemapRenderer::draw_tilemap_culled(Tilemap& tilemap) const {
                         Tile tile = chunk.tile[tile_x][tile_y];
                         TileProperties& tile_properties = tilemap.get_tile_properties(tile.get_id());
 
-                        Vector2 position = v2itov2(tilemap.chunk_to_tile_pos(Vector2i { chunk_x, chunk_y }, Vector2i(tile_x, tile_y)));
+                        Vector2 position = v2itov2(tilemap.chunk_to_tile_pos(Vector2i(chunk_x, chunk_y), Vector2i(tile_x, tile_y)));
 
                         DrawTextureEx(tile_properties.get_texture(), position, 0.0f, 1.0f, WHITE);
                     }

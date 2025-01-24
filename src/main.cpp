@@ -1,5 +1,6 @@
 #include <raylib.h>
 
+#include <utils/collisions.hpp>
 #include <raymath.h>
 #include <cstdio>
 #include <vector>
@@ -67,8 +68,6 @@ int main() {
         BeginTextureMode(screen_texture);
             ClearBackground(WHITE);
             BeginMode2D(camera);
-                printf("%d\n", render_system.chunk_is_visible(Vector2i(0, 0)));
-                /*render_system.draw_tilemap(*render_system.active_tilemap);*/
                 render_system.draw_tilemap_culled(*render_system.active_tilemap);
                 DrawTextureV(player_texture, player_position - Vector2 { player_texture.width/2.0f, player_texture.height/2.0f }, WHITE);
             EndMode2D();

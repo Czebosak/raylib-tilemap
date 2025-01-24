@@ -1,7 +1,7 @@
 #include "utils.hpp"
 #include "raylib.h"
 
-Vector2i::Vector2i(u32 x, u32 y) {
+Vector2i::Vector2i(i32 x, i32 y) {
     this->x = x;
     this->y = y;
 }
@@ -29,8 +29,6 @@ Vector2 v2itov2(Vector2i x) {
 }
 
 Vector2i v2tov2i(Vector2 x) {
-    return Vector2i {
-        (u32)x.x, (u32)x.y
-    };
+    return Vector2i(x.x, x.y);
 }
 
