@@ -27,7 +27,7 @@ bool TilemapRenderer::chunk_is_visible(const Vector2i pos) const {
     Rectanglei screen_chunk_rec = Rectanglei { screen_chunk_pos, chunk_size };
 
     // Create the camera screen rec
-    Rectanglei screen_rec = Rectanglei { Vector2i { 0, 0 }, Vector2i { active_camera->render_resolution.x, active_camera->render_resolution.y } };
+    Rectanglei screen_rec = Rectanglei { Vector2i { 0, 0 }, active_camera->render_resolution };
 
     if ((pos.x == 0) && (pos.y == 0)) {
         printf("Screen: %d, %d, %d, %d\n", screen_rec.pos.x, screen_rec.pos.y, screen_rec.size.x, screen_rec.size.y);
