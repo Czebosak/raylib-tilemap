@@ -9,6 +9,8 @@
 #include <render.hpp>
 #include <tilemap.hpp>
 
+const float SPEED = 250.0;
+
 int main() {
     Vector2 render_resolution = { 640.0f, 320.0f };
     Vector2 window_resolution = { 1920.0f, 1080.0f };
@@ -62,7 +64,7 @@ int main() {
             direction.x += 1.0f;
         }
 
-        player_position += Vector2Normalize(direction);
+        player_position += Vector2Normalize(direction) * GetFrameTime() * SPEED;
         camera.target = player_position;
 
         BeginTextureMode(screen_texture);
