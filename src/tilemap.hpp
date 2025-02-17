@@ -1,6 +1,7 @@
 #pragma once
 #include <raylib.h>
 
+#include <texture_system.hpp>
 #include <optional>
 #include <string>
 #include <memory>
@@ -14,10 +15,13 @@ class TileProperties {
 private:
     std::string texture_path;
     Texture texture;
+    bool dynamic_tile;
 public:
     TileProperties(const std::string texture_path);
 
-    const Texture& get_texture() const;
+    TileProperties(const std::string texture_path, bool dynamic_tile);
+
+    const Texture& get_texture(TextureSystem& texture_system);
 
     void load_texture();
 };

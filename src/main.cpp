@@ -4,6 +4,8 @@
 #include <raymath.h>
 #include <cstdio>
 #include <vector>
+#include <string_id.hpp>
+#include <database.hpp>
 
 #include <camera_ext.hpp>
 #include <render.hpp>
@@ -11,11 +13,17 @@
 
 const float SPEED = 250.0;
 
+namespace sid = foonathan::string_id;
+
 int main() {
     Vector2 render_resolution = { 640.0f, 320.0f };
     Vector2 window_resolution = { 1920.0f, 1080.0f };
 
     InitWindow(window_resolution.x, window_resolution.y, "Hi x3");
+
+    sid::default_database database;
+    
+    sid::string_id sid("Test0815", database);
 
     CameraExt camera;
     camera.render_resolution = v2tov2i(render_resolution);
@@ -29,6 +37,8 @@ int main() {
 
     RenderSystem render_system;
     render_system.active_camera = &camera;
+
+    TextureSystem texture_system;
 
     std::vector<TileProperties> tile_properties_vec = {
         TileProperties("assets/textures/dirt.png"),
@@ -70,7 +80,7 @@ int main() {
         BeginTextureMode(screen_texture);
             ClearBackground(WHITE);
             BeginMode2D(camera);
-                render_system.draw_tilemap_culled(*render_system.active_tilemap);
+                render_system.draw_tilemap_culled(*render_system.active_tilemap, texture_system);
                 DrawTextureV(player_texture, player_position - Vector2 { player_texture.width/2.0f, player_texture.height/2.0f }, WHITE);
             EndMode2D();
         EndTextureMode();

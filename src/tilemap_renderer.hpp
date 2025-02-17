@@ -22,5 +22,5 @@ public:
     CameraExt* active_camera;
 
     void draw_tilemap(Tilemap& tilemap) const;
-    void draw_tilemap_culled(Tilemap& tilemap) const;
+    void draw_tilemap_culled(Tilemap& tilemap, TextureSystem& texture_system) const;
 };

@@ -1,11 +1,18 @@
 #include "tilemap.hpp"
 
+#include <texture_system.hpp>
 #include <fstream>
 #include <memory>
 
-TileProperties::TileProperties(const std::string texture_path) : texture_path(texture_path) {}
+TileProperties::TileProperties(const std::string texture_path) : texture_path(texture_path), dynamic_tile(false) {}
 
-const Texture& TileProperties::get_texture() const {
+TileProperties::TileProperties(const std::string texture_path, bool dynamic_tile) : texture_path(texture_path), dynamic_tile(dynamic_tile) {}
+
+const Texture& TileProperties::get_texture(TextureSystem& texture_system) {
+    if (texture.id == 0) {
+        texture = *texture_system.get_or_load_texture(texture_path);
+    }
+
     return texture;
 }
 
@@ -28,8 +35,9 @@ Vector2i Tilemap::get_tile_size() const {
 }
 
 Vector2i Tilemap::fetch_tile_size() const {
-    Texture texture = tile_properties[0].get_texture();
-    return Vector2i(texture.width, texture.height);
+    /*Texture texture = tile_properties[0].get_texture();*/
+    /*return Vector2i(texture.width, texture.height);*/
+    return Vector2i(16, 16);
 }
 
 int Tilemap::get_data_from_file(const std::string filename) {

@@ -1,4 +1,5 @@
 #include "tilemap_renderer.hpp"
+#include "texture_system.hpp"
 
 #include <utils/utils.hpp>
 #include <utils/collisions.hpp>
@@ -29,13 +30,13 @@ void TilemapRenderer::draw_tilemap(Tilemap& tilemap) const {
         Tile tile = data[i];
         TileProperties& tile_properties = tilemap.get_tile_properties(tile.get_id());
 
-        Vector2 position = v2itov2(tilemap.convert_index_to_tile_position(i) * tile_properties.get_texture().width);
+        /*Vector2 position = v2itov2(tilemap.convert_index_to_tile_position(i) * tile_properties.get_texture().width);*/
 
-        DrawTextureEx(tile_properties.get_texture(), position, 0.0f, 1.0f, WHITE);
+        /*DrawTextureEx(tile_properties.get_texture(), position, 0.0f, 1.0f, WHITE);*/
     }
 }
 
-void TilemapRenderer::draw_tilemap_culled(Tilemap& tilemap) const {
+void TilemapRenderer::draw_tilemap_culled(Tilemap& tilemap, TextureSystem& texture_system) const {
     std::span<Tile> data = tilemap.get_data();
 
     for (u32 chunk_x = 0; chunk_x < tilemap.get_size().x / 16; chunk_x++) {
@@ -50,7 +51,7 @@ void TilemapRenderer::draw_tilemap_culled(Tilemap& tilemap) const {
 
                         Vector2 position = v2itov2(tilemap.chunk_to_tile_pos(Vector2i(chunk_x, chunk_y), Vector2i(tile_x, tile_y)));
 
-                        DrawTextureEx(tile_properties.get_texture(), position, 0.0f, 1.0f, WHITE);
+                        DrawTextureEx(tile_properties.get_texture(texture_system), position, 0.0f, 1.0f, WHITE);
                     }
                 }
             }
