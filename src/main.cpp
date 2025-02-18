@@ -4,8 +4,6 @@
 #include <raymath.h>
 #include <cstdio>
 #include <vector>
-#include <string_id.hpp>
-#include <database.hpp>
 
 #include <camera_ext.hpp>
 #include <render.hpp>
@@ -13,17 +11,11 @@
 
 const float SPEED = 250.0;
 
-namespace sid = foonathan::string_id;
-
 int main() {
     Vector2 render_resolution = { 640.0f, 320.0f };
     Vector2 window_resolution = { 1920.0f, 1080.0f };
 
     InitWindow(window_resolution.x, window_resolution.y, "Hi x3");
-
-    sid::default_database database;
-    
-    sid::string_id sid("Test0815", database);
 
     CameraExt camera;
     camera.render_resolution = v2tov2i(render_resolution);
