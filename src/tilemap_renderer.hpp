@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 
+#include <registry.hpp>
 #include <tilemap.hpp>
 #include <camera_ext.hpp>
 
@@ -21,6 +22,5 @@ public:
     Tilemap* active_tilemap;
     CameraExt* active_camera;
 
-    void draw_tilemap(Tilemap& tilemap) const;
-    void draw_tilemap_culled(Tilemap& tilemap, TextureSystem& texture_system) const;
+    void draw_tilemap_culled(const Tilemap& tilemap, const Registry& registry, TextureSystem& texture_system) const;
 };

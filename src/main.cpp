@@ -4,7 +4,9 @@
 #include <raymath.h>
 #include <cstdio>
 #include <vector>
+#include <boost/lexical_cast.hpp>
 
+#include <registry.hpp>
 #include <camera_ext.hpp>
 #include <render.hpp>
 #include <tilemap.hpp>
@@ -32,19 +34,23 @@ int main() {
 
     TextureSystem texture_system;
 
-    std::vector<TileProperties> tile_properties_vec = {
-        TileProperties("assets/textures/dirt.png"),
-        TileProperties("assets/textures/grass.png")
-    };
+    std::string x = "56edc9cb-21c3-4df0-93d4-d6b5ca25093d";
+    auto a = boost::lexical_cast<UUID>(x);
+    std::string y = "9fc3162e-eccf-4ed4-a851-f8866ca2a71c";
+    auto b = boost::lexical_cast<UUID>(y);
 
-    for (TileProperties& tile_properties : tile_properties_vec) {
-        tile_properties.load_texture();
-    }
+    Registry registry;
 
-    Tilemap tilemap(tile_properties_vec);
+    registry.register_tile(a, TileProperties("assets/textures/dirt.png", texture_system));
+    registry.register_tile(b, TileProperties("assets/textures/grass.png", texture_system));
+
+    Tilemap tilemap;
 
     printf("\n%d\n", tilemap.get_data_from_file("sd.map"));
     printf("%d, %d\n", tilemap.get_size().x, tilemap.get_size().y);
+
+    auto data = tilemap.get_data_mut();
+    data[0] = Tile(a);
 
     render_system.active_tilemap = &tilemap;
 
@@ -72,7 +78,7 @@ int main() {
         BeginTextureMode(screen_texture);
             ClearBackground(WHITE);
             BeginMode2D(camera);
-                render_system.draw_tilemap_culled(*render_system.active_tilemap, texture_system);
+                render_system.draw_tilemap_culled(*render_system.active_tilemap, registry, texture_system);
                 DrawTextureV(player_texture, player_position - Vector2 { player_texture.width/2.0f, player_texture.height/2.0f }, WHITE);
             EndMode2D();
         EndTextureMode();

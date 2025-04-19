@@ -3,8 +3,7 @@
 
 #include <utils/utils.hpp>
 #include <utils/collisions.hpp>
-
-#include <tilemap.hpp>
+#include <boost/lexical_cast.hpp>
 
 bool TilemapRenderer::chunk_is_visible(const Vector2i pos) const {
     Vector2i chunk_size = active_tilemap->get_tile_size() * TILEMAP_CHUNK_SIZE;
@@ -23,35 +22,29 @@ bool TilemapRenderer::chunk_is_visible(const Vector2i pos) const {
     return is_colliding(screen_rec, screen_chunk_rec);
 }
 
-void TilemapRenderer::draw_tilemap(Tilemap& tilemap) const {
-    std::span<Tile> data = tilemap.get_data();
+void TilemapRenderer::draw_tilemap_culled(const Tilemap& tilemap, const Registry& registry, TextureSystem& texture_system) const {
+    std::span<const Tile> data = tilemap.get_data();
 
-    for (int i; i < data.size(); i++) {
-        Tile tile = data[i];
-        TileProperties& tile_properties = tilemap.get_tile_properties(tile.get_id());
-
-        /*Vector2 position = v2itov2(tilemap.convert_index_to_tile_position(i) * tile_properties.get_texture().width);*/
-
-        /*DrawTextureEx(tile_properties.get_texture(), position, 0.0f, 1.0f, WHITE);*/
-    }
-}
-
-void TilemapRenderer::draw_tilemap_culled(Tilemap& tilemap, TextureSystem& texture_system) const {
-    std::span<Tile> data = tilemap.get_data();
-
-    for (u32 chunk_x = 0; chunk_x < tilemap.get_size().x / 16; chunk_x++) {
-        for (u32 chunk_y = 0; chunk_y < tilemap.get_size().y / 16; chunk_y++) {
+    for (u32 chunk_x = 0; chunk_x < tilemap.get_size().x / TILEMAP_CHUNK_SIZE; chunk_x++) {
+        for (u32 chunk_y = 0; chunk_y < tilemap.get_size().y / TILEMAP_CHUNK_SIZE; chunk_y++) {
             if (chunk_is_visible(Vector2i(chunk_x, chunk_y))) {
                 TilemapChunk chunk = tilemap.get_chunk(chunk_x, chunk_y);
 
                 for (int tile_x = 0; tile_x < TILEMAP_CHUNK_SIZE; tile_x++) {
                     for (int tile_y = 0; tile_y < TILEMAP_CHUNK_SIZE; tile_y++) {
                         Tile tile = chunk.tile[tile_x][tile_y];
-                        TileProperties& tile_properties = tilemap.get_tile_properties(tile.get_id());
 
-                        Vector2 position = v2itov2(tilemap.chunk_to_tile_pos(Vector2i(chunk_x, chunk_y), Vector2i(tile_x, tile_y)));
-
-                        DrawTextureEx(tile_properties.get_texture(texture_system), position, 0.0f, 1.0f, WHITE);
+                        if (!tile.get_uuid().is_nil()) {
+                            std::optional<const TileProperties*> tile_properties = registry.get_tile(tile.get_uuid());
+                            
+                            if (tile_properties) {
+                                Vector2 position = v2itov2(tilemap.chunk_to_tile_pos(Vector2i(chunk_x, chunk_y), Vector2i(tile_x, tile_y)));
+                                
+                                DrawTextureEx((*tile_properties)->get_texture(texture_system), position, 0.0f, 1.0f, WHITE);
+                            } else {
+                                //TraceLog(LOG_ERROR, "Could not find tile with uuid %s in registry", boost::lexical_cast<std::string>(tile.get_uuid()).c_str());
+                            }
+                        }
                     }
                 }
             }

@@ -11,3 +11,7 @@ source = "https://github.com/raysan5/raylib"
 install_command = "make PLATFORM=PLATFORM_DESKTOP"
 install_command_path = "src"
 include = ["src"]
+link_library = true
+
+[[libraries]]
+name = "boost"

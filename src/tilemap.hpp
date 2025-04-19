@@ -2,6 +2,8 @@
 #include <raylib.h>
 
 #include <texture_system.hpp>
+#include <utils/uuid.hpp>
+#include <utils/uuid_generators.hpp>
 #include <optional>
 #include <string>
 #include <memory>
@@ -14,34 +16,34 @@
 class TileProperties {
 private:
     std::string texture_path;
-    Texture texture;
+    mutable Texture texture;
     bool dynamic_tile;
 public:
-    TileProperties(const std::string texture_path);
+    TileProperties(const std::string texture_path, TextureSystem& texture_system);
+    TileProperties(const std::string texture_path, TextureSystem& texture_system, bool dynamic_tile);
 
-    TileProperties(const std::string texture_path, bool dynamic_tile);
-
-    const Texture& get_texture(TextureSystem& texture_system);
+    const Texture& get_texture(TextureSystem& texture_system) const;
 
     void load_texture();
 };
 
 class Tile {
 private:
-    u32 id;
+    UUID uuid;
 public:
     Tile();
+    Tile(UUID uuid);
 
-    Tile(u32 id);
-
-    inline u32 get_id() {
-        return id;
-    }
+    UUID get_uuid() const;
 };
 
 #define TILEMAP_CHUNK_SIZE 16
 
 struct TilemapChunk {
+    const Tile* tile[TILEMAP_CHUNK_SIZE];
+};
+
+struct TilemapChunkMut {
     Tile* tile[TILEMAP_CHUNK_SIZE];
 };
 
@@ -50,9 +52,8 @@ private:
     Vector2i size;
     Vector2i tile_size;
     std::unique_ptr<Tile[]> data;
-    std::span<TileProperties> tile_properties;
 public:
-    Tilemap(std::span<TileProperties> tile_properties);
+    Tilemap();
 
     Vector2i get_size() const;
 
@@ -66,22 +67,24 @@ public:
         return Vector2i(i % size.y, i / size.y);
     }
 
-    inline TileProperties& get_tile_properties(const u32 id) const {
-        return tile_properties[id];
-    }
-
-    inline std::optional<Tile> get_tile(u32 x, u32 y) const {
+    std::optional<Tile*> get_tile(u32 x, u32 y) const {
         if ((x < size.x) && (y < size.y)) {
-            return data[y * size.x + x];
+            return std::make_optional(&data[y * size.x + x]);
         }
-        return {};
+        return std::nullopt;
     }
 
-    inline std::span<Tile> get_data() {
+    std::span<const Tile> get_data() const {
         return std::span<Tile>(data.get(), size.x * size.y);
     }
 
-    TilemapChunk get_chunk(u32 x, u32 y);
+    std::span<Tile> get_data_mut() {
+        return std::span<Tile>(data.get(), size.x * size.y);
+    }
+
+    TilemapChunk get_chunk(u32 x, u32 y) const;
+    
+    TilemapChunkMut get_chunk_mut(u32 x, u32 y);
 
     Vector2i tile_position_to_world_position(const Vector2i pos) const;
     Vector2i chunk_to_tile_pos(Vector2i chunk_pos, Vector2i tile_pos) const;

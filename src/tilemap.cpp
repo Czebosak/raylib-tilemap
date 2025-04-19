@@ -4,13 +4,12 @@
 #include <fstream>
 #include <memory>
 
-TileProperties::TileProperties(const std::string texture_path) : texture_path(texture_path), dynamic_tile(false) {}
+TileProperties::TileProperties(const std::string texture_path, TextureSystem& texture_system) : texture_path(texture_path), texture(*texture_system.get_or_load_texture(texture_path)), dynamic_tile(false) {}
 
-TileProperties::TileProperties(const std::string texture_path, bool dynamic_tile) : texture_path(texture_path), dynamic_tile(dynamic_tile) {}
+TileProperties::TileProperties(const std::string texture_path, TextureSystem& texture_system, bool dynamic_tile) : texture_path(texture_path), texture(*texture_system.get_or_load_texture(texture_path)), dynamic_tile(dynamic_tile) {}
 
-const Texture& TileProperties::get_texture(TextureSystem& texture_system) {
+const Texture& TileProperties::get_texture(TextureSystem& texture_system) const {
     if (texture.id == 0) {
-        texture = *texture_system.get_or_load_texture(texture_path);
     }
 
     return texture;
@@ -20,11 +19,15 @@ void TileProperties::load_texture() {
     texture = LoadTexture(texture_path.c_str());
 }
 
-Tile::Tile() : id(0) {}
+Tile::Tile() : uuid(uuids::nil_uuid()) {}
 
-Tile::Tile(u32 id) : id(id) {}
+Tile::Tile(UUID uuid) : uuid(uuid) {}
 
-Tilemap::Tilemap(std::span<TileProperties> tile_properties) : size(Vector2i::zero()), tile_size(Vector2i::zero()), tile_properties(tile_properties), data() {}
+UUID Tile::get_uuid() const {
+    return uuid;
+}
+
+Tilemap::Tilemap() : size(Vector2i::zero()), tile_size(Vector2i::zero()), data() {}
 
 Vector2i Tilemap::get_size() const {
     return size;
@@ -59,8 +62,20 @@ int Tilemap::get_data_from_file(const std::string filename) {
     return 0;
 }
 
-TilemapChunk Tilemap::get_chunk(u32 x, u32 y) {
+TilemapChunk Tilemap::get_chunk(u32 x, u32 y) const {
     TilemapChunk chunk;
+
+    // Fill the chunk with a pointer to each row
+    for (int i = 0; i < TILEMAP_CHUNK_SIZE; i++) {
+        int a = ((x * TILEMAP_CHUNK_SIZE) + (y * TILEMAP_CHUNK_SIZE * this->size.x)) + (i * this->size.x);
+        chunk.tile[i] = &this->data[a];
+    }
+
+    return chunk;
+}
+
+TilemapChunkMut Tilemap::get_chunk_mut(u32 x, u32 y) {
+    TilemapChunkMut chunk;
 
     // Fill the chunk with a pointer to each row
     for (int i = 0; i < TILEMAP_CHUNK_SIZE; i++) {

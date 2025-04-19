@@ -1,3 +1,4 @@
 -std=c++20
 -Iexternal/raylib/src/
+-Iexternal/uuid/include
 -Isrc
