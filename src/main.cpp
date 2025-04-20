@@ -27,7 +27,7 @@ int main() {
     camera.zoom = 1.0f;
 
     Vector2 player_position = { 0.0f, 0.0f };
-    Texture2D player_texture = LoadTexture("assets/textures/yes_hair_bootsmoved.png");
+    Texture2D player_texture = LoadTexture(ASSETS_PATH "/textures/yes_hair_bootsmoved.png");
 
     RenderSystem render_system;
     render_system.active_camera = &camera;
@@ -41,12 +41,12 @@ int main() {
 
     Registry registry;
 
-    registry.register_tile(a, TileProperties("assets/textures/dirt.png", texture_system));
-    registry.register_tile(b, TileProperties("assets/textures/grass.png", texture_system));
+    registry.register_tile(a, TileProperties(ASSETS_PATH "textures/dirt.png", texture_system));
+    registry.register_tile(b, TileProperties(ASSETS_PATH "textures/grass.png", texture_system));
 
     Tilemap tilemap;
 
-    printf("\n%d\n", tilemap.get_data_from_file("sd.map"));
+    printf("\n%d\n", tilemap.get_data_from_file(PROJECT_PATH "sd.map"));
     printf("%d, %d\n", tilemap.get_size().x, tilemap.get_size().y);
 
     auto data = tilemap.get_data_mut();

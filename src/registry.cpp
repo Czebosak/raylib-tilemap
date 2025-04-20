@@ -26,4 +26,3 @@ void Registry::load_all_textures() {
         entry.second.load_texture();
     }
 }
-

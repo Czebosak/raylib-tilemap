@@ -11,7 +11,7 @@
 
 #include "utils/utils.hpp"
 
-#define TILEMAP_SIZE 1024
+constexpr int TILEMAP_SIZE = 1024;
 
 class TileProperties {
 private:
@@ -37,7 +37,7 @@ public:
     UUID get_uuid() const;
 };
 
-#define TILEMAP_CHUNK_SIZE 16
+constexpr int TILEMAP_CHUNK_SIZE = 16;
 
 struct TilemapChunk {
     const Tile* tile[TILEMAP_CHUNK_SIZE];
